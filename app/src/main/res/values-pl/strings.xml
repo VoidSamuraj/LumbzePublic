@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="play">Graj</string>
+    <string name="stats">Statystyki</string>
+    <string name="options">Opcje</string>
+    <string name="rows">Liczba Rzędów</string>
+    <string name="cellSize">Rozmiar</string>
+    <string name="you_are_signed">Jesteś zalogowany</string>
+    <string name="you_are_not_signed">Zaloguj się by zapisać</string>
+    <string name="signOut">Wyloguj się</string>
+    <string name="set_username">set username</string>
+    <string name="close">close</string>
+    <string name="change">change</string>
+    <string name="please_login">Please login first</string>
+</resources>

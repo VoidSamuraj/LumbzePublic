@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name" translatable="false">Lumbze</string>
+    <string name="play">Play</string>
+    <string name="stats">Stats</string>
+    <string name="options">Options</string>
+    <string name="rows">Rows</string>
+    <string name="cellSize">Cell Size</string>
+    <string name="you_are_signed">You are signed in</string>
+    <string name="you_are_not_signed">Sign in to save</string>
+    <string name="signOut">Sign out</string>
+    <string name="set_username">set username</string>
+    <string name="close">close</string>
+    <string name="change">change</string>
+    <string name="please_login">Please login first</string>
+</resources>

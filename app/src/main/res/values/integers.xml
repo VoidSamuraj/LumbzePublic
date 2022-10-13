@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="drawer_duration">200</integer>
+    <integer name="drawer_delay">50</integer>
+    <integer name="transition_duration">200</integer>
+</resources>
