@@ -6,7 +6,7 @@
     </style>
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
             <item name="windowSplashScreenBackground">@color/splashScreen</item>
-            <item name="windowSplashScreenAnimatedIcon">@drawable/round_splash_icon</item>
             <item name="postSplashScreenTheme">@style/Theme.Lumbze</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/round_splash_icon</item>
     </style>
 </resources>
