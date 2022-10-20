@@ -15,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalConfiguration
@@ -159,8 +160,9 @@ fun DrawDrawerContent(mazeViewModel: MazeViewModel, navigate: () -> Unit, logout
         DrawSliderWithText(
             state = mazeViewModel.cellSize,
             minValue = 10f,
-            maxValue = 60f,
-            setterFunction = mazeViewModel::setCellSize, stringResource(id = R.string.cellSize)
+            maxValue = 120f,
+            setterFunction = mazeViewModel::setCellSize, stringResource(id = R.string.cellSize),
+            isValueDisplayed = false
         )
         DrawSliderWithText(
             state = mazeViewModel.rowsAmount,
@@ -178,7 +180,8 @@ fun DrawDrawerContent(mazeViewModel: MazeViewModel, navigate: () -> Unit, logout
         ) {
             Text(
                 text = stringResource(id = R.string.stats),
-                fontFamily = mazeFont
+                fontFamily = mazeFont,
+                style = MaterialTheme.typography.h6
             )
         }
         Spacer(Modifier.weight(1f))
@@ -206,11 +209,11 @@ fun DrawDrawerContent(mazeViewModel: MazeViewModel, navigate: () -> Unit, logout
             }
     }
     if (isDialogShown.value)
-        showDialog(isDialogShown,mazeViewModel)
+        ShowDialog(isDialogShown,mazeViewModel)
 
 }
 @Composable
-fun showDialog(isDialogShown: MutableState<Boolean>,mazeViewModel: MazeViewModel){
+fun ShowDialog(isDialogShown: MutableState<Boolean>, mazeViewModel: MazeViewModel){
     val newName:MutableState<String> = remember {mutableStateOf(mazeViewModel.currentUserName.value) }
     AlertDialog(title = {
         Column(
@@ -226,7 +229,7 @@ fun showDialog(isDialogShown: MutableState<Boolean>,mazeViewModel: MazeViewModel
             Button(onClick = {
                 CoroutineScope(Dispatchers.Default)
                 mazeViewModel.editCurrentUserName(newName.value)
-              //  mazeViewModel.currentUserName.value = newName.value
+                //  mazeViewModel.currentUserName.value = newName.value
                 isDialogShown.value = false
             }) {
                 Text(text = stringResource(id = R.string.change))
@@ -254,24 +257,25 @@ fun showDialog(isDialogShown: MutableState<Boolean>,mazeViewModel: MazeViewModel
 }
 
 @Composable
-fun DrawSliderWithText(state: State<Int>, minValue:Float, maxValue:Float, setterFunction:(Int)->Unit, titleText:String){
+fun DrawSliderWithText(state: State<Int>, minValue:Float, maxValue:Float, setterFunction:(Int)->Unit, titleText:String,isValueDisplayed:Boolean=true){
     Box(modifier = Modifier.fillMaxWidth()){
         Text(text = titleText,
             modifier = Modifier.align(Alignment.TopStart),
             fontFamily = mazeFont,
             style = MaterialTheme.typography.h6)
-        Text(text = state.value.toString(),
-            modifier = Modifier.align(Alignment.Center),
-            fontFamily = mazeFont,
-            style = MaterialTheme.typography.h6)
+        if(isValueDisplayed)
+            Text(text = state.value.toString(),
+                modifier = Modifier.align(Alignment.Center),
+                fontFamily = mazeFont,
+                style = MaterialTheme.typography.h6)
     }
     Slider(value = state.value.toFloat(),
         onValueChange ={value->
             setterFunction(value.toInt())
         },
         steps = (maxValue-minValue-2).toInt(),
-        valueRange = minValue..maxValue
-
+        valueRange = minValue..maxValue,
+        colors = SliderDefaults.colors(activeTickColor =Color.Transparent, inactiveTickColor = Color.Transparent)
     )
 }
 @Preview(showBackground = true)

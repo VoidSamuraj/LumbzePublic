@@ -25,19 +25,17 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.*
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
+import com.google.android.gms.ads.*
 import com.voidsamuraj.lumbze.ui.theme.mazeFont
 import kotlinx.coroutines.*
-import java.util.Stack
 import kotlin.math.abs
 
 
@@ -102,7 +100,7 @@ fun DrawMaze(mazeViewModel: MazeViewModel, resources: Resources,navigateStats: (
         mazeViewModel.maze.ended.value.let {
             endTitles.value=it
         }
-        drawEndScreen(endTitles,mazeViewModel,resources,navigateStats)
+        DrawEndScreen(endTitles,mazeViewModel,resources,navigateStats)
 
         // for touch
         // can capture or block touch in box area
@@ -156,20 +154,6 @@ fun DrawMaze(mazeViewModel: MazeViewModel, resources: Resources,navigateStats: (
                                         }
 
                                     }
-                                    //CoroutineScope(Dispatchers.Main).launch {
-                                    // do {
-
-                                    //   awaitPointerEventScope {
-                                    /*    val event: PointerEvent = awaitPointerEvent()
-                                        event.changes.forEach { pointerInputChange: PointerInputChange ->
-                                            if (pointerInputChange.positionChange() != Offset.Zero) pointerInputChange.consume()
-                                            if (pointerInputChange.pressed != pointerInputChange.previousPressed) pointerInputChange.consume()
-                                        }*/
-                                    //    }
-                                    //  } while (event.changes.any { it.pressed })
-                                    //    (!mazeViewModel.isScreenTouchable.value)
-                                    // }
-
 
                                 }
                             } else {
@@ -186,12 +170,19 @@ fun DrawMaze(mazeViewModel: MazeViewModel, resources: Resources,navigateStats: (
                 }) {
 
             }
-        IconButton(onClick = {
-            mazeViewModel.maze.updateHelpDrawable()
+        val activity:MainActivity= LocalContext.current as MainActivity
+        val adId= stringResource(id = R.string.game_services_add_identity_id_test)
+        IconButton(
+            onClick = {
+                playAdd(addId = adId, mazeViewModel = mazeViewModel, activity = activity){
+                    mazeViewModel.maze.updateHelpDrawable()
+                }
 
-        }, modifier = Modifier
-            .align(Alignment.TopEnd)
-            .padding(20.dp),) {
+            },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(20.dp),
+        ) {
             Icon(painter = painterResource(id = R.drawable.ic_twotone_help_24), contentDescription ="help" , tint =  colorResource(id = R.color.trunk2), modifier = Modifier
                 .width(dimensionResource(id = R.dimen.icon_size))
                 .height(dimensionResource(id = R.dimen.icon_size)))
@@ -201,7 +192,7 @@ fun DrawMaze(mazeViewModel: MazeViewModel, resources: Resources,navigateStats: (
 }
 
 @Composable
-fun drawEndScreen(isScrollable: MutableState<Boolean>,mazeViewModel: MazeViewModel,resources:Resources,navigateStats:()->Unit){
+fun DrawEndScreen(isScrollable: MutableState<Boolean>, mazeViewModel: MazeViewModel, resources:Resources, navigateStats:()->Unit){
     val scrollState = rememberScrollState()
     var size by remember { mutableStateOf(IntSize.Zero) }
     if(isScrollable.value) {
@@ -319,22 +310,22 @@ fun drawEndScreen(isScrollable: MutableState<Boolean>,mazeViewModel: MazeViewMod
 
                     ) {
 
-                    drawText(
+                    DrawText(
                         text = "You got",
                         modifier = Modifier.align(Alignment.CenterHorizontally),
                         textStyle = MaterialTheme.typography.h5
                     )
-                    drawText(
+                    DrawText(
                         text = mazeViewModel.maze.allCells.toString(),
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
-                    drawText(
+                    DrawText(
                         text = "pieces of wood",
                         modifier = Modifier.align(Alignment.CenterHorizontally),
                         textStyle = MaterialTheme.typography.h5
                     )
                     Spacer(modifier = Modifier.height(20.dp))
-                    drawText(
+                    DrawText(
                         text = "Wood Thickness",
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
@@ -344,11 +335,11 @@ fun drawEndScreen(isScrollable: MutableState<Boolean>,mazeViewModel: MazeViewMod
                         horizontalArrangement = Arrangement.SpaceAround,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        drawTextButton("-") {
+                        DrawTextButton("-") {
                             mazeViewModel.setRowsAmount(mazeViewModel.rowsAmount.value.dec())
                         }
-                        drawText(text = mazeViewModel.rowsAmount.value.toString())
-                        drawTextButton("+") {
+                        DrawText(text = mazeViewModel.rowsAmount.value.toString())
+                        DrawTextButton("+") {
                             mazeViewModel.setRowsAmount(mazeViewModel.rowsAmount.value.inc())
                         }
                     }
@@ -384,40 +375,24 @@ fun drawEndScreen(isScrollable: MutableState<Boolean>,mazeViewModel: MazeViewMod
 fun pixelToDp(pixels:Int,resources: Resources): Dp {
     return (pixels / (resources.displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)).dp
 }
-
-suspend fun move(direction: Maze.CellDirections, mazeViewModel: MazeViewModel){
-    Log.v("BALLPOSP",""+mazeViewModel.maze.getBallPos())
+fun move(direction: Maze.CellDirections, mazeViewModel: MazeViewModel){
     mazeViewModel.maze.moveBall(direction)
-    Log.v("BALLPOSA",""+mazeViewModel.maze.getBallPos()+" "+mazeViewModel.maze.ended+" "+mazeViewModel.isScreenTouchable+" "+mazeViewModel.isDrawerOpen)
-
-}
-
-@Preview
-@Composable
-fun gameScreenPreview(){
-     val data:Stack<Pair<Int,Int>> = Stack()
-    data.add(Pair(0,1))
-    data.add(Pair(1,2))
-    data.add(Pair(1,3))
-    data.add(Pair(1,4))
-    data.add(Pair(1,5))
-    data.add(Pair(1,6))
 }
 
 @Composable
-fun drawTextButton(text:String,
+fun DrawTextButton(text:String,
                    textStyle: TextStyle=MaterialTheme.typography.h4,
                    color:Color= colorResource(id = R.color.endScreenText),
                    onButtonClick:()->Unit={}){
     TextButton(onClick = {onButtonClick()}) {
-        drawText(text=text,
+        DrawText(text=text,
             textStyle =textStyle,
             color = color)
     }
 
 }
 @Composable
-fun drawText(text:String,
+fun DrawText(text:String,
              modifier: Modifier=Modifier,
              textStyle: TextStyle=MaterialTheme.typography.h4,
              color:Color= colorResource(id = R.color.endScreenText )){
@@ -428,6 +403,53 @@ fun drawText(text:String,
         style = textStyle,
         color = color
     )
-
-
 }
+fun playAdd(addId:String,mazeViewModel: MazeViewModel,activity: MainActivity,onSuccess:()->Unit){
+
+    setAdd(mazeViewModel){
+        activity.initAdd(addId,activity)
+    }
+    if (mazeViewModel.mRewardedAd != null) {
+        mazeViewModel.mRewardedAd?.show(activity) {
+            onSuccess()
+            Log.d("ADS", "User earned the reward.")
+        }
+    } else {
+        Log.d("ADS", "The rewarded ad wasn't ready yet.")
+    }
+}
+fun setAdd(mazeViewModel:MazeViewModel,onDismiss:()->Unit){
+    val TAG="ADS"
+    mazeViewModel.mRewardedAd?.fullScreenContentCallback = object: FullScreenContentCallback() {
+        override fun onAdClicked() {
+            // Called when a click is recorded for an ad.
+            Log.d(TAG, "Ad was clicked.")
+        }
+
+        override fun onAdDismissedFullScreenContent() {
+            // Called when ad is dismissed.
+            // Set the ad reference to null so you don't show the ad a second time.
+            Log.d(TAG, "Ad dismissed fullscreen content.")
+            mazeViewModel.mRewardedAd = null
+            onDismiss()
+
+        }
+
+        override fun onAdFailedToShowFullScreenContent(p0: AdError) {
+            // Called when ad fails to show.
+            Log.e(TAG, "Ad failed to show fullscreen content.")
+            mazeViewModel.mRewardedAd = null
+        }
+
+        override fun onAdImpression() {
+            // Called when an impression is recorded for an ad.
+            Log.d(TAG, "Ad recorded an impression.")
+        }
+
+        override fun onAdShowedFullScreenContent() {
+            // Called when ad is shown.
+            Log.d(TAG, "Ad showed fullscreen content.")
+        }
+    }
+}
+

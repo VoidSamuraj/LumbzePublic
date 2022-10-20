@@ -10,6 +10,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.ads.rewarded.RewardedAd
 import com.voidsamuraj.lumbze.db.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,11 +31,11 @@ class MazeViewModel():ViewModel() {
     val isLoading = _isLoading.asStateFlow()
     init {
         viewModelScope.launch()  {
-            delay(800)
+            delay(1000L)
             _isLoading.value = false
         }
     }
-
+    var mRewardedAd: RewardedAd? = null
 
     //Displayed in stats card
     private val userStats:MutableState<List<Pair<Int,User>>?> = mutableStateOf(null)

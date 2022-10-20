@@ -2,20 +2,27 @@ package com.voidsamuraj.lumbze
 
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import com.google.android.gms.ads.*
+import com.google.android.gms.ads.rewarded.RewardedAd
+import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.voidsamuraj.lumbze.db.UsersFirebaseDAO
 import com.voidsamuraj.lumbze.ui.theme.LumbzeTheme
 import kotlinx.coroutines.CoroutineScope
@@ -40,8 +47,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         auth=MyAuthentication(getString(R.string.firebase_auth_key),this)
         this.requestedOrientation=ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+
         setContent {
             LumbzeTheme() {
+                initAdd(stringResource(id = R.string.game_services_add_identity_id_test),LocalContext.current)
+
                 width=with(LocalDensity.current){   LocalConfiguration.current.screenWidthDp.dp.toPx()}.toInt()
                 mazeViewModel.maze.apply {
                     postData(
@@ -63,6 +73,7 @@ class MainActivity : ComponentActivity() {
                     resources = resources)
             }
         }
+        MobileAds.initialize(this)
     }
 
     override fun onStart() {
@@ -107,6 +118,23 @@ class MainActivity : ComponentActivity() {
             }
 
         }
+    }
+    fun initAdd(addId:String,context: Context/*, onSuccess:()->Unit*/){
+        val adRequest: AdRequest = AdRequest.Builder().build()
+        RewardedAd.load(context,
+            addId,
+            adRequest, object : RewardedAdLoadCallback() {
+                override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                    Log.d("ADDS", loadAdError.toString())
+                    mazeViewModel.mRewardedAd=null
+                }
+
+                override fun onAdLoaded(rewardedAd: RewardedAd) {
+                    Log.d("ADDS", "Ad was loaded.")
+                    mazeViewModel.mRewardedAd=rewardedAd
+                    //  onSuccess()
+                }
+            })
     }
 
 }

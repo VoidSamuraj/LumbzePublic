@@ -3,7 +3,6 @@ package com.voidsamuraj.lumbze
 import android.app.Activity
 import android.content.Intent
 import android.content.IntentSender
-import android.util.Log
 import androidx.core.app.ActivityCompat.startIntentSenderForResult
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
@@ -14,7 +13,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-
+import  com.google.firebase.crashlytics.internal.model.CrashlyticsReport.Session.Event.Log
 
 class MyAuthentication(clientId:String, activity: MainActivity) {
 
@@ -28,10 +27,8 @@ class MyAuthentication(clientId:String, activity: MainActivity) {
     fun signOut()=auth.signOut()
     fun firebaseOnStartSetup(ifUserLogged:()->Unit){
         currentUser = auth.currentUser
-        if(currentUser!=null) {
-            Log.d("FIREBASE", "signInWithToken:success")
+        if(currentUser!=null)
             ifUserLogged()
-        }
     }
     init{
         //one tap
@@ -66,13 +63,14 @@ class MyAuthentication(clientId:String, activity: MainActivity) {
                         result.pendingIntent.intentSender, 2137,
                         null, 0, 0, 0, null)
                 } catch (e: IntentSender.SendIntentException) {
-                    Log.e("ONE_CLICK", "Couldn't start One Tap UI: ${e.localizedMessage}")
+
+                    Log.builder().setContent( "Couldn't start One Tap UI ${e.localizedMessage}").build()
                 }
             }
             .addOnFailureListener(mActivity as Activity) { e ->
                 // No saved credentials found. Launch the One Tap sign-up flow, or
                 // do nothing and continue presenting the signed-out UI.
-                Log.d("ONE_CLICK", ""+e.localizedMessage)
+                Log.builder().setContent( "ONE_CLICK_FAILURE ${e.localizedMessage}").build()
             }
     }
     fun onFirebaseResult(requestCode:Int,data:Intent?,onSignSuccess:()->Unit){
@@ -81,7 +79,6 @@ class MyAuthentication(clientId:String, activity: MainActivity) {
                 try {
                     val credential = oneTapClient!!.getSignInCredentialFromIntent(data)
                     val idToken = credential.googleIdToken
-                    val password = credential.password
                     when {
                         idToken != null -> {
                             val firebaseCredential = GoogleAuthProvider.getCredential(idToken, null)
@@ -89,34 +86,18 @@ class MyAuthentication(clientId:String, activity: MainActivity) {
                                 .addOnCompleteListener(mActivity as Activity) { task ->
                                     if (task.isSuccessful) {
                                         // Sign in success, update UI with the signed-in user's information
-                                        Log.d("FIREBASE", "signInWithCredential:success")
                                         currentUser=auth.currentUser
                                         onSignSuccess()
-
-                                        // updateUI(user)
                                     } else {
                                         // If sign in fails, display a message to the user.
-                                        Log.w("FIREBASE", "signInWithCredential:failure", task.exception)
-                                        //updateUI(null)
+
+                                        Log.builder().setContent( "signInWithCredential:failure ${task.exception}").build()
                                     }
                                 }
-
-
-                            // Got an ID token from Google. Use it to authenticate
-                            // with your backend.
-                            Log.v("ONE_CLICK", "Got ID token.")
-                        }
-                        password != null -> {
-                            // Got a saved username and password. Use them to authenticate
-                            // with your backend.
-                            Log.v("ONE_CLICK", "Got password.")
-                        }
-                        else -> {
-                            Log.e("ONE_CLICK", "No ID token or password!")
                         }
                     }
                 } catch (e: ApiException) {
-                    Log.e("ON_ACTIVITY_RESULT", e.toString())
+                    Log.builder().setContent("ON_ACTIVITY_RESULT ${e.localizedMessage}").build()
                 }
             }
         }
