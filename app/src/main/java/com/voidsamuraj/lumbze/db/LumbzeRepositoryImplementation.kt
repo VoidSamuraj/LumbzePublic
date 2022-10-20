@@ -1,6 +1,5 @@
 package com.voidsamuraj.lumbze.db
 
-import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filter
@@ -84,9 +83,7 @@ class LumbzeRepositoryImplementation(
         if(_firebaseDAO!=null)
             CoroutineScope(Dispatchers.IO).launch {
                 val roomUser = getUserFromRoom("2137")
-                Log.v("SYNCHRONIZE", "start")
                 val firebaseUser = getUserFromFirebase(id)
-                Log.v("SYNCHRONIZE", "isFirebaseUser $firebaseUser roomUser $roomUser")
                 if (roomUser != null) {
                     //compare users if not null
 
@@ -111,17 +108,13 @@ class LumbzeRepositoryImplementation(
                 } else if (firebaseUser != null) {
                     //first time user logged
                     roomUserDao.addUser(firebaseUser)
-                    Log.v("SYNCHRONIZE","SecondScenario")
-
                 }
             }
     }
 
     private suspend fun getUserFromFirebase(id: String):User?{
         var userRet:User?=null
-        _firebaseDAO!!.dataFlow?.filter {user->Log.v(
-            "USERS IN FIREBASE",""+user)
-            id==user.id   }?.collect{ userRet=it }
+        _firebaseDAO!!.dataFlow?.filter {user-> id==user.id }?.collect{ userRet=it }
         return userRet
     }
     private fun getUserFromRoom(id: String):User?{
