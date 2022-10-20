@@ -87,7 +87,7 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:30.4.0')
 
     implementation 'com.google.firebase:firebase-auth-ktx'
-    implementation 'com.google.firebase:firebase-database-ktx:20.0.6'
+    implementation 'com.google.firebase:firebase-database-ktx:20.1.0'
     implementation 'com.google.android.gms:play-services-auth:20.3.0'
     implementation "com.google.android.gms:play-services-games-v2:17.0.0"
     // Add the dependencies for the Crashlytics and Analytics libraries
@@ -98,4 +98,7 @@ dependencies {
     implementation("io.coil-kt:coil-gif:2.2.1")
 
     implementation "androidx.core:core-splashscreen:1.0.0"
+
+    implementation 'com.google.android.gms:play-services-ads:21.3.0'
+
 }
