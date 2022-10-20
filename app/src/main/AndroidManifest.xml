@@ -19,6 +19,8 @@
 
         <meta-data android:name="com.google.android.gms.games.APP_ID"
             android:value="@string/firebase_auth_key"/>
+        <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="@string/game_services_adds_id"/>
 
         <activity
             android:name=".MainActivity"
